@@ -39,4 +39,5 @@ def iris_stash_code(code):
     iris_stash_code = 'm01s'+temp[0:2]+'i'+temp[2:]
     return iris_stash_code
 
+if __name__ == '__main__':
 

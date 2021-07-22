@@ -13,11 +13,12 @@ import numpy as np
 
 
 
-indir = '/storage/silver/diamet/sws98slg/UG_elevated_conv_project/'
+# indir = '/storage/silver/diamet/sws98slg/UG_elevated_conv_project/'
 # Use this form to get all the files.
 #filename = indir + 'prodm_op_ukv_20190723_15_*.pp'
 #filename = indir + 'prods_op_ukv_20190723_15_002.pp'
-filename = indir + 'prods_op_gl-mn_20190723_18_*.pp'
+# filename = indir + 'prods_op_gl-mn_20190723_18_*.pp'
+filename = '/Users/brianlo/Desktop/Reading/PhD/WCD/data/prods_op_gl-mn_20210708_00_000.pp'
 print(filename)
 
 # Load whole file to look what's inside
@@ -62,7 +63,8 @@ for it in range(np.shape(pptn)[0]) :
 #    ax = fig.subplots()
 
 # Filled contour plot of rainfall rate. Use log intervals in contour values.
-    con=qplt.contourf(pptn[it,...], pptn_cv,  colors=pptn_colors)
+    print(pptn.data)
+    con=qplt.contourf(pptn[:], pptn_cv, colors=pptn_colors)
 
 # Add coastlines.
     plt.gca().coastlines(resolution='10m')
@@ -72,6 +74,6 @@ for it in range(np.shape(pptn)[0]) :
     plt.title(title)
 # Display the plot. Need to close the plot window to carry on.
     fn = f'global_rain_{tm.day:02d}{tm.hour:02d}{tm.minute:02d}.png'
-    plt.savefig(fn)
+    # plt.savefig(fn)
     plt.show()
 

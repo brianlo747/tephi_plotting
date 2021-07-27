@@ -24,8 +24,8 @@ class GlobalModelPlot(object):
                     color_field_cmap_bounds=None,
                     color_field_cbar_labels=None,
                     color_field_contours=False,
-                    contour_field=None,
-                    contour_field_levels=None,
+                    contour_field1=None,
+                    contour_field1_levels=None,
                     contour_field2=None,
                     contour_field2_levels=None,
                     plot_title=None,
@@ -56,12 +56,20 @@ class GlobalModelPlot(object):
                                           transform=ccrs.PlateCarree(), colors='black', linewidths=0.2)
             ax.clabel(pcolor_countours, inline=True, fontsize=5, inline_spacing=1)
 
-        second_countours = ax.contour(self.global_model_obj.iris_cubes[contour_field].coord('longitude').points,
-                                      self.global_model_obj.iris_cubes[contour_field].coord('latitude').points,
-                                      self.global_model_obj.iris_cubes[contour_field].data / 1000,
-                                      levels=contour_field_levels,
+        field1_countours = ax.contour(self.global_model_obj.iris_cubes[contour_field1].coord('longitude').points,
+                                      self.global_model_obj.iris_cubes[contour_field1].coord('latitude').points,
+                                      self.global_model_obj.iris_cubes[contour_field1].data,
+                                      levels=contour_field1_levels,
                                       transform=ccrs.PlateCarree(), colors='black', linewidths=0.6)
-        ax.clabel(second_countours, inline=True, fontsize=6, inline_spacing=1, use_clabeltext=True)
+        ax.clabel(field1_countours, inline=True, fontsize=6, inline_spacing=1, use_clabeltext=True)
+
+        if contour_field2 is not None:
+            field2_countours = ax.contour(self.global_model_obj.iris_cubes[contour_field2].coord('longitude').points,
+                                          self.global_model_obj.iris_cubes[contour_field2].coord('latitude').points,
+                                          self.global_model_obj.iris_cubes[contour_field2].data,
+                                          levels=contour_field2_levels,
+                                          transform=ccrs.PlateCarree(), colors='#00008B', linewidths=0.4)
+            ax.clabel(field2_countours, inline=True, fontsize=6, inline_spacing=1, use_clabeltext=True)
 
         lat_lines = np.arange(20, 85, 10)
         lon_lines = np.arange(-80, 100, 10)

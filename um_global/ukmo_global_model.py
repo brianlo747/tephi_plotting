@@ -87,12 +87,20 @@ class UkmoGlobalModel(object):
             else:
                 self.iris_cubes[f"{standard_name}_{cell_method}"] = iris_loaded_cube
 
+    def convert_units(self, field_name, new_units):
+        self.iris_cubes[field_name].convert_units(new_units)
+
     def calculate_thickness(self, top_p_level=500, bottom_p_level=1000):
-        thickness_field = (self.iris_cubes[f"geopotential_height_{top_p_level}hPa"] - \
-                           self.iris_cubes[f"geopotential_height_{bottom_p_level}hPa"]) / 10
-        thickness_field.units = f"dm"
+        thickness_field = self.iris_cubes[f"geopotential_height_{top_p_level}hPa"] - \
+                          self.iris_cubes[f"geopotential_height_{bottom_p_level}hPa"]
+
         thickness_field.long_name = f"thickness_{bottom_p_level}_{top_p_level}hPa"
         self.iris_cubes[f"thickness_{bottom_p_level}_{top_p_level}hPa"] = thickness_field
+
+    def calculate_total_rainfall_rate(self):
+        tot_pptn_field = self.iris_cubes[f"convective_rainfall_flux"] + \
+                         self.iris_cubes[f"stratiform_rainfall_flux"]
+        self.iris_cubes[f"total_rainfall_rate"] = tot_pptn_field
 
 
 if __name__ == '__main__':

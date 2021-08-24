@@ -19,7 +19,7 @@ class GlobalModelPlot(object):
 
     def plot_fields(self,
                     color_field,
-                    output_plot_name,
+                    output_plot_directory,
                     color_field_cmap=None,
                     color_field_cmap_bounds=None,
                     color_field_cbar_labels=None,
@@ -87,9 +87,12 @@ class GlobalModelPlot(object):
 
         # Details in black rectangle
         datetime_obj = self.global_model_obj.iris_cubes[color_field].coord('forecast_reference_time')
-        datetime_string = datetime_obj.units.num2date(datetime_obj.points[0]).strftime('%Y-%m-%d (%a) %H:%M:%SZ')
+        datetime_string = f"Issued: " \
+                          f"{datetime_obj.units.num2date(datetime_obj.points[0]).strftime('%Y-%m-%d (%a) %H:%M:%SZ')}"
+        fcst_obj = self.global_model_obj.iris_cubes[color_field].coord('time')
+        fcst_string = f"{fcst_obj.units.num2date(fcst_obj.points[0]).strftime('%Y-%m-%d (%a) %H:%M:%SZ')}"
         fcst_tplus = np.round(self.global_model_obj.iris_cubes[color_field].coord('forecast_period').points[0])
-        datetime_fcst_string = f"{datetime_string} T+{fcst_tplus:.0f}h"
+        fcst_valid_string = f"{fcst_string} T+{fcst_tplus:.0f}h"
         ax.text(0.001, 0.0125, "UKMO Global",
                 horizontalalignment='left',
                 verticalalignment='center',
@@ -100,12 +103,21 @@ class GlobalModelPlot(object):
                 verticalalignment='center',
                 color='white', zorder=11,
                 size=5, transform=ax.transAxes)
-        ax.text(0.750, 0.0125, datetime_fcst_string, horizontalalignment='center', verticalalignment='center',
+        ax.text(0.750, 0.0125, datetime_string, horizontalalignment='center', verticalalignment='center',
                 color='white', size=5, zorder=11,
                 transform=ax.transAxes)
         ax.text(0.999, 0.0125, "UoR-Met-WCD", horizontalalignment='right', verticalalignment='center',
                 color='yellow', size=5, zorder=11,
                 transform=ax.transAxes)
+
+        # Black rectangle at top left
+        ax.add_patch(Rectangle((0, 1), 0.325, -0.05, alpha=1, zorder=20, transform=ax.transAxes,
+                               facecolor='black'))
+        ax.text(0.005, 0.975, fcst_valid_string, horizontalalignment='left', verticalalignment='center',
+                color='white', size=8, zorder=21,
+                transform=ax.transAxes)
+
+        # Details in black rectangle
 
         # Cbar
         ax_divider = make_axes_locatable(ax)
@@ -124,6 +136,6 @@ class GlobalModelPlot(object):
         ax.add_artist(ab)
 
         # plt.show()
-        plt.savefig(f'/Users/brianlo/Desktop/Reading/PhD/WCD/output/{output_plot_name}.png', dpi=dpi,
+        plt.savefig(output_plot_directory, dpi=dpi,
                     bbox_inches='tight',
                     pad_inches=0)

@@ -24,6 +24,25 @@ def convert_pressure_temperature_to_pressure_theta(pressure, temperature):
     return pressure, theta
 
 
+def convert_temperature_theta_to_temperature_pressure(temperature, theta):
+    """
+    Transform temperature and potential temperature into temperature and pressure
+    :param temperature: temperature in degC
+    :type temperature: list-like
+    :param theta: potential temperature in degC
+    :type theta: list-like
+    :return: Pressure in hPa, potential temperature in degC
+    :rtype: tuple
+    """
+    temperature, theta = np.asarray(temperature), np.asarray(theta)
+
+    temperature_kelvin = temperature + CONST_KELVIN
+    theta_kelvin = theta + CONST_KELVIN
+
+    pressure = CONST_P0 * (temperature_kelvin / theta_kelvin) ** (CONST_CP_AIR / CONST_GAS_CONST_AIR)
+    return temperature, pressure
+
+
 def convert_pressure_theta_to_temperature_theta(pressure, theta):
     """
     Transform pressure and potential temperature into pressure and temperature.

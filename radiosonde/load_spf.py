@@ -1,7 +1,9 @@
 import sys
+import os
 import array
 import numpy as np
 import pandas as pd
+from io import StringIO
 
 
 class Radiosonde(object):
@@ -218,10 +220,67 @@ class Radiosonde(object):
         print(self.sounding_data)
 
 
+class RadiosondeMetDB(object):
+
+    def __init__(self, infile):
+        if os.path.basename(infile).startswith('Temps_'):
+            self._read_metdb(infile)
+        else:
+            raise ValueError("Wrong file format!")
+
+    def _read_metdb(self, infile):
+        with open(infile) as f:
+            all_text = f.read()
+            f.close()
+        final_observation_idx = all_text.rfind(' Observation    ')
+        if final_observation_idx == -1:
+            raise ValueError("No observations found in file!")
+        self.max_observations = int(all_text[final_observation_idx + 16])
+
+        self.metadata_list = []
+        self.sounding_list = []
+        for i in range(self.max_observations):
+            with open(infile) as f:
+                metadata_lines = f.readlines()[121 * i + 3:121 * i + 17]
+                metadata_lines = ''.join(metadata_lines)
+                f.seek(0)
+                data_lines = f.readlines()[121 * i + 19:121 * i + 121]
+                data_lines = ''.join(data_lines)
+                meta_data = StringIO(metadata_lines)
+                data_data = StringIO(data_lines)
+                f.close()
+            pd_metadata = pd.read_table(meta_data, sep='.  ', index_col=0, header=None, engine='python')
+            pd_metadata.index = [header.replace('.', '') for header in pd_metadata.index]
+            pd_sounding = pd.read_table(data_data, delim_whitespace=True, header=0)
+            pd_sounding_names = {'lv': 'lv', 'lev': 'lev_id', 'id': 'PnPn', 'PnPn': 'hnhnhn', 'hnhnhn': 'TnTnTn',
+                                 'TnTnTn': 'DnDn', 'DnDn': 'dndn', 'dndn': 'fnfnfn'}
+            pd_sounding = pd_sounding.iloc[:, :-1]
+            pd_sounding.rename(columns=pd_sounding_names, inplace=True)
+            pd_sounding.replace({-9999999.00: np.nan}, inplace=True)
+            self.metadata_list.append(pd_metadata)
+            self.sounding_list.append(pd_sounding)
+
+    def get_datacols_no_na(self, obs_num, cols):
+        selected_metadata = self.metadata_list[obs_num - 1]
+        selected_profile = self.sounding_list[obs_num - 1].dropna(subset=cols)
+        return selected_metadata, selected_profile
+
+    def prune_data(self, prune_pressure_list, selected_profile):
+        pruned_profile = pd.DataFrame()
+        for prune_pressure in prune_pressure_list:
+            idx = selected_profile['PnPn'].sub(prune_pressure).abs().argmin()
+            pruned_profile = pruned_profile.append(selected_profile.iloc[idx], ignore_index=True)
+        pruned_profile.drop_duplicates(subset=['PnPn'])
+        return pruned_profile
+
+
 if __name__ == '__main__':
     # Radiosonde(
     #     infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/metoffice-radiosonde_herstmonceux_20200901231505.spf')
     # Radiosonde(
     #     infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/metoffice-radiosonde_herstmonceux_20200720231505.spf')
-    Radiosonde(
-        infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/metoffice-vaisala-rs41-sg-radiosonde_herstmonceux_20200720231505_autosonde-launch.tsv')
+    # Radiosonde(
+    #     infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/metoffice-vaisala-rs41-sg-radiosonde_herstmonceux_20200720231505_autosonde-launch.tsv')
+    RadiosondeMetDB(
+        infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/Temps_23Z20210726'
+    )

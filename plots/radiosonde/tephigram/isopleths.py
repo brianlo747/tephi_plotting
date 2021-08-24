@@ -3,7 +3,7 @@ import numpy as np
 from constants.thermodynamics import CONST_ES0, CONST_GAS_CONST_AIR, CONST_GAS_CONST_VAP, CONST_TO, \
     CONST_LATENT_HEAT_VAP_WATER, \
     CONST_EPSILON, CONST_KELVIN, CONST_CP_AIR
-from tephigram_transforms import (
+from plots.radiosonde.tephigram.tephigram_transforms import (
     convert_pressure_temperature_to_pressure_theta,
     convert_pressure_theta_to_temperature_theta, convert_pressure_mixing_ratio_to_temperature)
 
@@ -97,7 +97,7 @@ def _moist_adiabat_gradient(min_temperature, max_pressure, pressure, temperature
     cc_equation_exp = (CONST_LATENT_HEAT_VAP_WATER / CONST_GAS_CONST_VAP) * (
             (1.0 / CONST_KELVIN) - (1.0 / temperature_kelvin))
     e_s = CONST_ES0 * np.exp(cc_equation_exp)
-    r_vs = e_s * CONST_EPSILON / (pressure - e_s)
+    r_vs = e_s * CONST_EPSILON / (pressure)
     lrwbt = (CONST_LATENT_HEAT_VAP_WATER * r_vs) / (CONST_GAS_CONST_AIR * temperature_kelvin)
     numerator = ((CONST_GAS_CONST_AIR * temperature_kelvin) / (CONST_CP_AIR * pressure)) * (1.0 + lrwbt)
     denominator = 1.0 + (lrwbt * ((CONST_EPSILON * CONST_LATENT_HEAT_VAP_WATER) / (CONST_CP_AIR * temperature_kelvin)))

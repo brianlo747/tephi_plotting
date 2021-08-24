@@ -4,7 +4,7 @@ import numpy as np
 
 class PrecipCmap(object):
     precip_cmap = (mpl.colors.ListedColormap(
-        ['#DCDCDC', '#7BB1E7', '#5093D7', '#2869BE', '#1DC918', '#FEF139', '#FF9900', '#EC3219', '#A800AB', '#FE5DFB',
+        ['#848484', '#7BB1E7', '#5093D7', '#2869BE', '#1DC918', '#FEF139', '#FF9900', '#EC3219', '#A800AB', '#FE5DFB',
          '#FFFFFF']))
 
 

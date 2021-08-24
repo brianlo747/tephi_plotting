@@ -1,3 +1,5 @@
+import datetime
+
 import iris
 
 from errors.io import PressureLevelNotFound
@@ -37,6 +39,14 @@ class UkmoGlobalModel(object):
 
         # Cell Method
         if cell_method is not None:
+            datetime_obj = iris.load(self.model_filepath, constraint)[0].coord('time')
+            latest_dt = datetime_obj.points[-1]
+            datetime_string = datetime_obj.units.num2date(latest_dt).strftime('%Y-%m-%d (%a) %H:%M:%SZ')
+            latest_dt = datetime.datetime.strptime(datetime_string, '%Y-%m-%d (%a) %H:%M:%SZ')
+            datetime_positive = latest_dt + datetime.timedelta(minutes=1)
+            datetime_negative = latest_dt - datetime.timedelta(minutes=1)
+            constraint = constraint & iris.Constraint(
+                time=lambda cell: datetime_negative <= cell.point < datetime_positive)
             selected_cubes = iris.load(self.model_filepath, constraint)
             for idx, sc in enumerate(selected_cubes):
                 if any(cm.method == cell_method for cm in sc.cell_methods):
@@ -104,7 +114,7 @@ class UkmoGlobalModel(object):
 
 
 if __name__ == '__main__':
-    global_model_obj = UkmoGlobalModel('/Users/brianlo/Desktop/Reading/PhD/WCD/data/prods_op_gl-mn_20210708_00_012.pp')
+    global_model_obj = UkmoGlobalModel('/Users/brianlo/Desktop/Reading/PhD/WCD/data/prods_op_gl-mn_20210708_00_000.pp')
     global_model_obj.print_cube_menu(standard_name='stratiform_rainfall_flux')
     # global_model_obj.read_dataset('geopotential_height', cell_method='', pressure_level=1000)
     # global_model_obj.read_dataset('geopotential_height', cell_method='', pressure_level=500)

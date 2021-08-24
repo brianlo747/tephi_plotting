@@ -1,4 +1,4 @@
-from tephigram_transforms import (
+from plots.radiosonde.tephigram.tephigram_transforms import (
     convert_pressure_temperature_to_pressure_theta,
     convert_pressure_theta_to_temperature_theta, convert_pressure_mixing_ratio_to_temperature)
 
@@ -10,7 +10,7 @@ def isotherm_label(pressure, axes, transform, temperature):
                                text=f"{temperature}°C",
                                ha='right',
                                va='top',
-                               fontsize=4,
+                               fontsize=8,
                                color='#23CE1F')
 
     return annotation
@@ -24,7 +24,7 @@ def isobar_label(along, isopleth_val, axes, transform, pressure):
                                    text=f"{pressure}hPa",
                                    ha='right',
                                    va='bottom',
-                                   fontsize=5,
+                                   fontsize=10,
                                    color='#23CE1F')
     elif along == 'isentrope':
         temperature, _ = convert_pressure_theta_to_temperature_theta(pressure, isopleth_val)
@@ -33,7 +33,7 @@ def isobar_label(along, isopleth_val, axes, transform, pressure):
                                    text=f"{pressure}hPa",
                                    ha='center',
                                    va='bottom',
-                                   fontsize=5,
+                                   fontsize=10,
                                    color='#23CE1F')
     else:
         raise ValueError("Your along option does not exist!")
@@ -49,7 +49,7 @@ def mixing_ratio_label(pressure, axes, transform, mixing_ratio):
                                text=f"{mixing_ratio:g}",
                                ha='right',
                                va='top',
-                               fontsize=3,
+                               fontsize=6,
                                rotation=55, rotation_mode='anchor',
                                annotation_clip=True,
                                color='#23CE1F')

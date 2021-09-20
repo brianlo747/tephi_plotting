@@ -1,6 +1,4 @@
 import numpy as np
-import metpy.calc as mpcalc
-from metpy.units import units
 import matplotlib.pyplot as plt
 from radiosonde.load_spf import RadiosondeMetDB
 from radiosonde.calc_wetbulb import wet_bulb_temperature

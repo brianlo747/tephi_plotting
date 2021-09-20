@@ -19,9 +19,10 @@ def plot_all_tephigrams(infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/Temp
             pressures_winds)
 
         # Calculate Tw
-        wet_bulb = wet_bulb_temperature(pressures_temperatures_dews['PnPn'].values,
-                                        pressures_temperatures_dews['TnTnTn'].values,
-                                        pressures_temperatures_dews['DnDn'].values)
+        wet_bulb_old = mpcalc.wet_bulb_temperature(
+            pressures_temperatures_dews['PnPn'].values * units.Pa,
+            pressures_temperatures_dews['TnTnTn'].values * units.K,
+            pressures_temperatures_dews['DnDn'].values * units.K)
 
         tpg = Tephigram()
 
@@ -29,7 +30,7 @@ def plot_all_tephigrams(infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/Temp
                          label='Temperature', color='red', linewidth=0.8)
         tpg.plot_profile(pressures_dews['PnPn'] / 100, pressures_dews['DnDn'] - 273.15,
                          label='Dew Point', color='blue', linewidth=0.8)
-        tpg.plot_profile(pressures_temperatures['PnPn'] / 100, wet_bulb - 273.15,
+        tpg.plot_profile(pressures_temperatures['PnPn'] / 100, wet_bulb,
                          label='Wet Bulb', color='violet', linewidth=0.8)
         tpg.plot_barbs(pressures_winds['PnPn'] / 100, pressures_winds['fnfnfn'] * 1.94384449,
                        pressures_winds['dndn'] + 180.0)

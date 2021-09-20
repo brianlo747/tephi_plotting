@@ -39,9 +39,22 @@ class SatPlot(object):
         ax.axis('off')
         ax.outline_patch.set_visible(False)
 
-        transform_latlon_to_stere = pyproj.Transformer.from_proj('epsg:4326', prj.proj4_init, always_xy=True)
-        bl_x, bl_y = transform_latlon_to_stere.transform(self.sat_obj.bl_long / 1000, self.sat_obj.bl_lat / 1000)
-        tr_x, tr_y = transform_latlon_to_stere.transform(self.sat_obj.tr_long / 1000, self.sat_obj.tr_lat / 1000)
+        # For Pyproj version >=2.1.0
+        # transform_latlon_to_stere = pyproj.Transformer.from_proj('epsg:4326', prj.proj4_init, always_xy=True)
+        # bl_x, bl_y = transform_latlon_to_stere.transform(self.sat_obj.bl_long / 1000, self.sat_obj.bl_lat / 1000)
+        # tr_x, tr_y = transform_latlon_to_stere.transform(self.sat_obj.tr_long / 1000, self.sat_obj.tr_lat / 1000)
+
+        # For Pyproj version ==1.9.6
+        proj_latlon = pyproj.Proj(init='epsg:4326', switch=False)
+        proj_bng = pyproj.Proj(**prj.proj4_params, switch=False)
+        bl_x, bl_y = pyproj.transform(p1=proj_latlon,
+                                      p2=proj_bng,
+                                      x=self.sat_obj.bl_long / 1000,
+                                      y=self.sat_obj.bl_lat / 1000)
+        tr_x, tr_y = pyproj.transform(p1=proj_latlon,
+                                      p2=proj_bng,
+                                      x=self.sat_obj.tr_long / 1000,
+                                      y=self.sat_obj.tr_lat / 1000)
 
         lat_lines = np.arange(20, 85, 10)
         lon_lines = np.arange(-80, 100, 10)

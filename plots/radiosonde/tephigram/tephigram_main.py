@@ -94,7 +94,7 @@ class Tephigram:
                                  {"color": "#23CE1F", "linewidth": 0.05})
         _PlotGroup(self.axes, isotherms_func, np.arange(-90, 70, 1))
         isotherms_func = partial(isopleths.isotherm, 50, 1050, self.axes, self.transform,
-                                 {"color": "#23CE1F", "linewidth": 0.35})
+                                 {"color": "#23CE1F", "linewidth": 0.40})
         _PlotGroup(self.axes, isotherms_func, np.arange(-90, 70, 10))
 
         # Draw isentropes
@@ -107,12 +107,12 @@ class Tephigram:
                                {"color": "#23CE1F", "linewidth": 0.05})
         _PlotGroup(self.axes, isobars_func, np.arange(50, 1051, 10))
         isobars_func = partial(isopleths.isobar, -90, 70, self.axes, self.transform,
-                               {"color": "#23CE1F", "linewidth": 0.35})
+                               {"color": "#23CE1F", "linewidth": 0.40})
         _PlotGroup(self.axes, isobars_func, np.arange(100, 1051, 100))
 
         # Draw moist adiabats
         moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
-                                      {"color": "#23CE1F", "linewidth": 0.35})
+                                      {"color": "#23CE1F", "linewidth": 0.40})
         _PlotGroup(self.axes, moist_adiabats_func, np.arange(-40, 70, 10))
         moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
                                       {"color": "#23CE1F", "linewidth": 0.05})

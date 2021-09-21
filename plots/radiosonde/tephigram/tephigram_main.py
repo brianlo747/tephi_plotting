@@ -177,12 +177,13 @@ class Tephigram:
 
     def read_metadata(self, metadata,
                       sonde_lookup_filepath='/Users/brianlo/Desktop/Reading/PhD/WCD/data/SondeStations.txt'):
-        self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 1]:02.0f}{metadata.loc['WMO_STTN_NMBR', 1]:03.0f}"
-        self.year = f"{metadata.loc['YEAR', 1]:.0f}"
-        self.month = f"{metadata.loc['MONTH', 1]:02.0f}"
-        self.day = f"{metadata.loc['DAY', 1]:02.0f}"
-        self.hour = f"{metadata.loc['HOUR', 1]:02.0f}"
-        self.minute = f"{metadata.loc['MINT', 1]:02.0f}"
+        self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 'info']:02.0f}" \
+                          f"{metadata.loc['WMO_STTN_NMBR', 'info']:03.0f}"
+        self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
+        self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
+        self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
+        self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
+        self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
         if os.path.isfile(sonde_lookup_filepath):
             self.sonde_lookup_table = pd.read_csv(sonde_lookup_filepath, sep=' ', header=None, index_col=0,
                                                   dtype='string')
@@ -205,14 +206,16 @@ class Title:
     """Generate a title for the tephigram"""
 
     def __init__(self, metadata, axes,
-                 sonde_lookup_filepath='/Users/brianlo/Desktop/Reading/PhD/WCD/data/SondeStations.txt'):
+                 sonde_lookup_filepath='../../../lookup/SondeStations.txt'):
+        os.chdir(os.path.dirname(__file__))
         self.axes = axes
-        self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 1]:02.0f}{metadata.loc['WMO_STTN_NMBR', 1]:03.0f}"
-        self.year = f"{metadata.loc['YEAR', 1]:.0f}"
-        self.month = f"{metadata.loc['MONTH', 1]:02.0f}"
-        self.day = f"{metadata.loc['DAY', 1]:02.0f}"
-        self.hour = f"{metadata.loc['HOUR', 1]:02.0f}"
-        self.minute = f"{metadata.loc['MINT', 1]:02.0f}"
+        self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 'info']:02.0f}" \
+                          f"{metadata.loc['WMO_STTN_NMBR', 'info']:03.0f}"
+        self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
+        self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
+        self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
+        self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
+        self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
         if os.path.isfile(sonde_lookup_filepath):
             self.sonde_lookup_table = pd.read_csv(sonde_lookup_filepath, sep=' ', header=None, index_col=0,
                                                   dtype='string')

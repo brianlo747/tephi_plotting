@@ -1,0 +1,12 @@
+03005 Lerwick
+03023 South_Uist
+03238 Albemarle
+03354 Watnall
+03502 Aberporth
+03590 Wattisham
+03693 Shoeburyness
+03743 Larkhill
+03808 Camborne
+03882 Herstmonceux
+03918 Castor_Bay
+03953 Valentia

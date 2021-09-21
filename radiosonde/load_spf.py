@@ -251,6 +251,7 @@ class RadiosondeMetDB(object):
                 f.close()
             pd_metadata = pd.read_table(meta_data, sep='.  ', index_col=0, header=None, engine='python')
             pd_metadata.index = [header.replace('.', '') for header in pd_metadata.index]
+            pd_metadata.rename(columns={1: 'info'}, inplace=True)
             pd_sounding = pd.read_table(data_data, delim_whitespace=True, header=0)
             pd_sounding_names = {'lv': 'lv', 'lev': 'lev_id', 'id': 'PnPn', 'PnPn': 'hnhnhn', 'hnhnhn': 'TnTnTn',
                                  'TnTnTn': 'DnDn', 'DnDn': 'dndn', 'dndn': 'fnfnfn'}

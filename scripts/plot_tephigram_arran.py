@@ -6,7 +6,7 @@ from radiosonde.calc_wetbulb import wet_bulb_temperature
 from plots.radiosonde.tephigram.tephigram_main import Tephigram
 
 
-def plot_wyoming_tephigram(date, station, theta_w=False):
+def plot_wyoming_tephigram(date, station, output_dir, theta_w=False):
     sonde_obj = WyomingUpperAirSonde(date, station)
 
     sonde_data = sonde_obj.get_dataframe()
@@ -31,18 +31,25 @@ def plot_wyoming_tephigram(date, station, theta_w=False):
                    pressures_winds['direction'].values + 180.0)
     tpg.plot_main_title(sonde_metadata)
     tpg.read_metadata(sonde_metadata)
-    tpg.save_tephi(output_dir='/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis_arran/')  # Change output dir!!
-    # plt.show()
+    tpg.save_tephi(output_dir=output_dir)
     plt.close('all')
 
 
 if __name__ == '__main__':
+
+    # Change the following lines
     main_date = datetime(2021, 9, 20, 0)
     station_list = ['03005', '03023', '03238', '03354', '03502', '03590',
                     '03693', '03743', '03808', '03882', '03918', '03953']
+    output_dir = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis_arran/'
+    ############################
+
     for station_num in station_list:
         try:
-            plot_wyoming_tephigram(date=main_date, station=station_num, theta_w=False)
+            plot_wyoming_tephigram(date=main_date,
+                                   station=station_num,
+                                   output_dir=output_dir,
+                                   theta_w=False)
             print(f"Plotted {main_date.strftime('%Y-%m-%d %HZ')} for station {station_num}.")
         except ValueError as ve:
             print(ve)

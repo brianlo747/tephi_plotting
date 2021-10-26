@@ -13,7 +13,8 @@ def plot_all_tephigrams(infile='/Users/brianlo/Desktop/Reading/PhD/WCD/data/Temp
         _, pressures_dews = sonde_obj.get_datacols_no_na(i + 1, ['PnPn', 'DnDn'])
         _, pressures_winds = sonde_obj.get_datacols_no_na(i + 1, ['PnPn', 'dndn', 'fnfnfn'])
         pressures_winds = sonde_obj.prune_data(
-            np.array([1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 300, 250, 200, 100, 50]) * 100,
+            np.array(
+                [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 100, 50]) * 100,
             pressures_winds)
 
         # Calculate Tw

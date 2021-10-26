@@ -91,31 +91,31 @@ class Tephigram:
 
         # Draw isotherms
         isotherms_func = partial(isopleths.isotherm, 50, 1050, self.axes, self.transform,
-                                 {"color": "#23CE1F", "linewidth": 0.05})
+                                 {"color": "#23CE1F", "linewidth": 0.08})
         _PlotGroup(self.axes, isotherms_func, np.arange(-90, 70, 1))
         isotherms_func = partial(isopleths.isotherm, 50, 1050, self.axes, self.transform,
-                                 {"color": "#23CE1F", "linewidth": 0.40})
+                                 {"color": "#23CE1F", "linewidth": 0.30})
         _PlotGroup(self.axes, isotherms_func, np.arange(-90, 70, 10))
 
         # Draw isentropes
         isentropes_func = partial(isopleths.isentropes, -90, 70, 50, 1050, self.axes, self.transform,
-                                  {"color": "#23CE1F", "linewidth": 0.05})
+                                  {"color": "#23CE1F", "linewidth": 0.08})
         _PlotGroup(self.axes, isentropes_func, np.arange(-90, 250, 10))
 
         # Draw isobars
         isobars_func = partial(isopleths.isobar, -90, 70, self.axes, self.transform,
-                               {"color": "#23CE1F", "linewidth": 0.05})
+                               {"color": "#23CE1F", "linewidth": 0.08})
         _PlotGroup(self.axes, isobars_func, np.arange(50, 1051, 10))
         isobars_func = partial(isopleths.isobar, -90, 70, self.axes, self.transform,
-                               {"color": "#23CE1F", "linewidth": 0.40})
+                               {"color": "#23CE1F", "linewidth": 0.30})
         _PlotGroup(self.axes, isobars_func, np.arange(100, 1051, 100))
 
         # Draw moist adiabats
         moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
-                                      {"color": "#23CE1F", "linewidth": 0.40})
+                                      {"color": "#23CE1F", "linewidth": 0.30})
         _PlotGroup(self.axes, moist_adiabats_func, np.arange(-40, 70, 10))
         moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
-                                      {"color": "#23CE1F", "linewidth": 0.05})
+                                      {"color": "#23CE1F", "linewidth": 0.08})
         _PlotGroup(self.axes, moist_adiabats_func, np.arange(-40, 70, 2))
 
         # Draw mixing ratios
@@ -129,6 +129,15 @@ class Tephigram:
         isotherm_label_list = np.arange(-40, 70, 10)
         isotherm_label_func = partial(labels.isotherm_label, 1000, self.axes, self.transform)
         _PlotLabel(self.axes, isotherm_label_func, isotherm_label_list)
+
+        isotherm_label_list = np.arange(-80, 0, 10)
+        isotherm_label_func = partial(labels.isotherm_label, 190, self.axes, self.transform)
+        _PlotLabel(self.axes, isotherm_label_func, isotherm_label_list)
+
+        # Isentrope Labels
+        isentrope_label_list = np.arange(-40, 220, 20)
+        isentrope_label_func = partial(labels.isentrope_label, -45, self.axes, self.transform)
+        _PlotLabel(self.axes, isentrope_label_func, isentrope_label_list)
 
         # Isobar Labels
         isobar_label_list = np.array([50, 60, 70, 80, 90, 100, 150, 200])
@@ -147,7 +156,9 @@ class Tephigram:
         mixing_ratio_label_list = np.array(
             [0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.80, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9,
              10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 68, 80])
-        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 1050, self.axes, self.transform)
+        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 1054, 'right', self.axes, self.transform)
+        _PlotLabel(self.axes, mixing_ratio_label_func, mixing_ratio_label_list)
+        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 496, 'left', self.axes, self.transform)
         _PlotLabel(self.axes, mixing_ratio_label_func, mixing_ratio_label_list)
 
         # Retain aspect ratio
@@ -175,6 +186,10 @@ class Tephigram:
         title = Title(metadata, self.axes)
         title.plot_main_title()
 
+    def plot_dorset_title(self, metadata):
+        title = DorsetTitle(metadata, self.axes)
+        title.plot_main_title()
+
     def read_metadata(self, metadata,
                       sonde_lookup_filepath='/Users/brianlo/Desktop/Reading/PhD/WCD/data/SondeStations.txt'):
         self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 'info']:02.0f}" \
@@ -191,6 +206,14 @@ class Tephigram:
             self.sonde_lookup_table['name'] = self.sonde_lookup_table['name'].str.replace('_', ' ')
             self.station_name = self.sonde_lookup_table.loc[self.station_id]['name']
 
+    def read_metadata_dorset(self, metadata):
+        self.station_id = None
+        self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
+        self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
+        self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
+        self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
+        self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
+
     def save_tephi(self, output_dir):
         plt.savefig(f"{output_dir}/"
                     f"{self.station_name}_{self.station_id}_"
@@ -200,6 +223,9 @@ class Tephigram:
                     f"{self.station_name}_{self.station_id}_"
                     f"{self.year}{self.month}{self.day}{self.hour}{self.minute}Z.png", dpi=300,
                     bbox_inches='tight', pad_inches=0)
+
+    def save_tephi_manual(self, output_path, **kwargs):
+        plt.savefig(output_path, bbox_inches='tight', pad_inches=0, **kwargs)
 
 
 class Title:
@@ -227,6 +253,22 @@ class Title:
         else:
             self.plot_title = f"{self.station_id} " \
                               f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+
+    def plot_main_title(self, **kwargs):
+        self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',
+                           textcoords='offset points', fontsize=20)
+
+
+class DorsetTitle(object):
+
+    def __init__(self, metadata, axes):
+        self.axes = axes
+        self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
+        self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
+        self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
+        self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
+        self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
+        self.plot_title = f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
 
     def plot_main_title(self, **kwargs):
         self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',

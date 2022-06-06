@@ -30,8 +30,8 @@ def plot_dorset_tephigram(infile, outfile, theta_w=False):
                    pressures_winds['WindDir'].values + 180)
     tpg.plot_dorset_title(sonde_metadata)
     tpg.read_metadata_dorset(sonde_metadata)
-    tpg.save_tephi_manual(output_path=f"{output_file}.png", dpi=300)
-    tpg.save_tephi_manual(output_path=f"{output_file}.pdf")
+    tpg.save_tephi_manual(output_path=f"{outfile}.png", dpi=300)
+    tpg.save_tephi_manual(output_path=f"{outfile}.pdf")
     plt.close('all')
 
 

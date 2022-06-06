@@ -1,14 +1,12 @@
-import numbers
-import numpy as np
 from functools import partial
 import os.path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import interp1d
-from plots.radiosonde.tephigram.tephigram_transforms import *
-import plots.radiosonde.tephigram.isopleths as isopleths
-import plots.radiosonde.tephigram.labels as labels
+from plots.radiosonde.skewt.skewt_transforms import *
+import plots.radiosonde.skewt.isopleths as isopleths
+import plots.radiosonde.skewt.labels as labels
 
 
 class _PlotGroup():
@@ -48,7 +46,7 @@ class _PlotLabel():
             plot_func(level)
 
 
-class Tephigram:
+class SkewTLogP:
     """Generates a tephigram of one or more pressure and tempereature datasets."""
 
     def __init__(self):
@@ -62,9 +60,10 @@ class Tephigram:
         # plt.show()
 
         self.figure = plt.figure(figsize=(7.8565, 11.1055))
+        # self.figure = plt.figure()
 
         # Tephigram transformation
-        self.tephi_transform = TephigramTransform()
+        self.skewt_transform = SkewTTransform()
 
         # Intialise subplot
         self.axes = self.figure.add_subplot()
@@ -85,9 +84,9 @@ class Tephigram:
         # self.figure.patch.set_visible(False)
 
         # Drawing
-        self.transform = self.tephi_transform + self.axes.transData
-        self.axes.tephi_transform = self.tephi_transform
-        self.axes.tephi_inverse = self.tephi_transform.inverted()
+        self.transform = self.skewt_transform + self.axes.transData
+        self.axes.skewt_transform = self.skewt_transform
+        self.axes.skewt_inverse = self.skewt_transform.inverted()
 
         # Draw isotherms
         isotherms_func = partial(isopleths.isotherm, 50, 1050, self.axes, self.transform,
@@ -165,8 +164,8 @@ class Tephigram:
         self.axes.set_aspect(1.0)
 
         # Limits
-        self.axes.set_xlim(0.48, 1.26)
-        self.axes.set_ylim(-1.06, -0.18)
+        self.axes.set_xlim(5.6, 8.5)
+        self.axes.set_ylim(-0.2, 3.2)
 
         # Initialise blank profile lists
         self._profiles = []
@@ -214,49 +213,56 @@ class Tephigram:
         self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
         self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
 
-    def save_tephi(self, output_dir):
-        plt.savefig(f"{output_dir}/"
-                    f"{self.station_name}_{self.station_id}_"
-                    f"{self.year}{self.month}{self.day}{self.hour}{self.minute}Z.pdf",
-                    bbox_inches='tight', pad_inches=0, backend='pgf')
-        plt.savefig(f"{output_dir}/"
-                    f"{self.station_name}_{self.station_id}_"
-                    f"{self.year}{self.month}{self.day}{self.hour}{self.minute}Z.png", dpi=300,
-                    bbox_inches='tight', pad_inches=0)
-
-    def save_tephi_manual(self, output_path, **kwargs):
-        plt.savefig(output_path, bbox_inches='tight', pad_inches=0, **kwargs)
-
-
-class Title:
-    """Generate a title for the tephigram"""
-
-    def __init__(self, metadata, axes,
-                 sonde_lookup_filepath='../../../lookup/SondeStations.txt'):
-        os.chdir(os.path.dirname(__file__))
-        self.axes = axes
-        self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 'info']:02.0f}" \
-                          f"{metadata.loc['WMO_STTN_NMBR', 'info']:03.0f}"
-        self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
-        self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
-        self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
-        self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
-        self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
-        if os.path.isfile(sonde_lookup_filepath):
-            self.sonde_lookup_table = pd.read_csv(sonde_lookup_filepath, sep=' ', header=None, index_col=0,
-                                                  dtype='string')
-            self.sonde_lookup_table.columns = ['name']
-            self.sonde_lookup_table['name'] = self.sonde_lookup_table['name'].str.replace('_', ' ')
-            self.station_name = self.sonde_lookup_table.loc[self.station_id]['name']
-            self.plot_title = f"{self.station_name} {self.station_id}\n" \
-                              f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+    def save_tephi(self, output_dir, full_name=None):
+        if full_name is None:
+            plt.savefig(f"{output_dir}/"
+                        f"{self.station_name}_{self.station_id}_"
+                        f"{self.year}{self.month}{self.day}{self.hour}{self.minute}Z.pdf",
+                        bbox_inches='tight', pad_inches=0, backend='pgf')
+            plt.savefig(f"{output_dir}/"
+                        f"{self.station_name}_{self.station_id}_"
+                        f"{self.year}{self.month}{self.day}{self.hour}{self.minute}Z.png", dpi=300,
+                        bbox_inches='tight', pad_inches=0)
         else:
-            self.plot_title = f"{self.station_id} " \
-                              f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+            plt.savefig(f"{output_dir}/"
+                        f"{full_name}.pdf",
+                        bbox_inches='tight', pad_inches=0, backend='pgf')
+            plt.savefig(f"{output_dir}/"
+                        f"{full_name}.png", dpi=300,
+                        bbox_inches='tight', pad_inches=0)
 
-    def plot_main_title(self, **kwargs):
-        self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',
-                           textcoords='offset points', fontsize=20)
+        def save_tephi_manual(self, output_path, **kwargs):
+            plt.savefig(output_path, bbox_inches='tight', pad_inches=0, **kwargs)
+
+    class Title:
+        """Generate a title for the tephigram"""
+
+        def __init__(self, metadata, axes,
+                     sonde_lookup_filepath='../../../lookup/SondeStations.txt'):
+            os.chdir(os.path.dirname(__file__))
+            self.axes = axes
+            self.station_id = f"{metadata.loc['WMO_BLCK_NMBR', 'info']:02.0f}" \
+                              f"{metadata.loc['WMO_STTN_NMBR', 'info']:03.0f}"
+            self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
+            self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
+            self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
+            self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
+            self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
+            if os.path.isfile(sonde_lookup_filepath):
+                self.sonde_lookup_table = pd.read_csv(sonde_lookup_filepath, sep=' ', header=None, index_col=0,
+                                                      dtype='string')
+                self.sonde_lookup_table.columns = ['name']
+                self.sonde_lookup_table['name'] = self.sonde_lookup_table['name'].str.replace('_', ' ')
+                self.station_name = self.sonde_lookup_table.loc[self.station_id]['name']
+                self.plot_title = f"{self.station_name} {self.station_id}\n" \
+                                  f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+            else:
+                self.plot_title = f"{self.station_id} " \
+                                  f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+
+        def plot_main_title(self, **kwargs):
+            self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',
+                               textcoords='offset points', fontsize=20)
 
 
 class DorsetTitle(object):
@@ -282,10 +288,10 @@ class Profile:
         pressures, temperatures = np.asarray(pressures), np.asarray(temperatures)
         assert pressures.shape == temperatures.shape
         self.axes = axes
-        self._transform = self.axes.tephi_transform + self.axes.transData
+        self._transform = self.axes.skewt_transform + self.axes.transData
         self.pressures = pressures
         self.temperatures = temperatures
-        _, self.thetas = convert_pressure_temperature_to_pressure_theta(self.pressures, self.temperatures)
+        # _, self.thetas = convert_pressure_temperature_to_pressure_theta(self.pressures, self.temperatures)
         # self.line = None
 
     def plot(self, **kwargs):
@@ -293,7 +299,7 @@ class Profile:
             kwargs["zorder"] = 10
 
         (self.line,) = self.axes.plot(
-            self.temperatures, self.thetas, transform=self._transform, **kwargs
+            self.temperatures, self.pressures, transform=self._transform, **kwargs
         )
         return self.line
 
@@ -308,7 +314,7 @@ class Barbs:
         self.wind_directions = wind_directions
         self.barbs = None
         self._gutter = None
-        self._transform = self.axes.tephi_transform + self.axes.transData
+        self._transform = self.axes.skewt_transform + self.axes.transData
         self._kwargs = None
         self._custom_kwargs = None
         self._custom = dict(
@@ -322,27 +328,27 @@ class Barbs:
         v = magnitude * np.cos(np.deg2rad(angle))
         return u, v
 
-    def _make_barb(self, temperature, theta, speed, angle):
+    def _make_barb(self, temperature, pressure, speed, angle):
         u, v = self._uv(speed, angle)
-        barb = plt.barbs(temperature, theta, u, v, transform=self._transform, **self._kwargs)
+        barb = plt.barbs(temperature, pressure, u, v, transform=self._transform, **self._kwargs)
         return barb
 
     def _calculate_barb_positions(self, pressures):
         axesfrac_y_points = np.linspace(0, 1, 1001)
         axesfrac_x_points = np.ones_like(axesfrac_y_points) * self._gutter
         axes_frac_xy = np.column_stack((axesfrac_x_points, axesfrac_y_points))
-        transAxes = self.axes.transLimits.inverted() + self.axes.tephi_inverse
-        temperature_theta_points = transAxes.transform(axes_frac_xy)
-        temperature, theta = temperature_theta_points[:, 0], temperature_theta_points[:, 1]
-        _, pressure_points = convert_temperature_theta_to_temperature_pressure(temperature, theta)
-        interp_func = interp1d(pressure_points, temperature, fill_value="extrapolate")
+        transAxes = self.axes.transLimits.inverted() + self.axes.skewt_inverse
+        temperature_pressure_points = transAxes.transform(axes_frac_xy)
+        temperature, pressure = temperature_pressure_points[:, 0], temperature_pressure_points[:, 1]
+        # _, pressure_points = convert_temperature_theta_to_temperature_pressure(temperature, pressure)
+        interp_func = interp1d(pressure, temperature, fill_value="extrapolate")
         temperatures = interp_func(pressures)
-        _, thetas = convert_pressure_temperature_to_pressure_theta(pressures, temperatures)
+        # _, thetas = convert_pressure_temperature_to_pressure_theta(pressures, temperatures)
 
-        return temperatures, thetas
+        return temperatures, pressures
 
     def plot(self, **kwargs):
-        self._gutter = kwargs.pop("gutter", 0.9)
+        self._gutter = kwargs.pop("gutter", 0.95)
         self._kwargs = dict(length=5, linewidth=0.2, zorder=10)
         self._kwargs.update(kwargs)
         self._custom_kwargs = dict(
@@ -357,10 +363,6 @@ class Barbs:
         self.pressures, self.wind_speeds, self.wind_directions = \
             np.asarray(self.pressures), np.asarray(self.wind_speeds), np.asarray(self.wind_directions)
 
-        temperatures, thetas = self._calculate_barb_positions(self.pressures)
-        self._make_barb(temperatures, thetas, self.wind_speeds, self.wind_directions)
-
-
-if __name__ == '__main__':
-    tpg = Tephigram()
-    plt.savefig('test.png', dpi=300, pad_inches=0)
+        temperatures, _ = self._calculate_barb_positions(self.pressures)
+        pressures = self.pressures
+        self._make_barb(temperatures, pressures, self.wind_speeds, self.wind_directions)

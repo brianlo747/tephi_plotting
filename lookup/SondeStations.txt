@@ -10,3 +10,4 @@
 03882 Herstmonceux
 03918 Castor_Bay
 03953 Valentia
+45004 King's_Park_(Hong_Kong)

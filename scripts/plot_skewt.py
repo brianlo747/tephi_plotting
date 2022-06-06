@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from radiosonde.load_wyo_upperair import WyomingUpperAirSonde
 from radiosonde.calc_wetbulb import wet_bulb_temperature
-from plots.radiosonde.tephigram.tephigram_main import Tephigram
+from plots.radiosonde.skewt.skewt_main import SkewTLogP
 
 
-def plot_wyoming_tephigram(date, station, output_dir, theta_w=False):
+def plot_wyoming_skewt(date, station, output_dir, theta_w=False):
     sonde_obj = WyomingUpperAirSonde(date, station)
 
     sonde_data = sonde_obj.get_dataframe()
@@ -14,43 +14,42 @@ def plot_wyoming_tephigram(date, station, output_dir, theta_w=False):
     pressures_winds = sonde_obj.prune_data(
         np.array([1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 300, 250, 200, 100, 50]))
 
-    tpg = Tephigram()
+    skt = SkewTLogP()
 
-    tpg.plot_profile(sonde_data['pressure'].values, sonde_data['temperature'].values,
+    skt.plot_profile(sonde_data['pressure'].values, sonde_data['temperature'].values,
                      label='Temperature', color='red', linewidth=0.8)
-    tpg.plot_profile(sonde_data['pressure'].values, sonde_data['dewpoint'].values,
+    skt.plot_profile(sonde_data['pressure'].values, sonde_data['dewpoint'].values,
                      label='Dew Point', color='blue', linewidth=0.8)
     if theta_w:
         wet_bulb = wet_bulb_temperature(sonde_data['pressure'].values * 100,
                                         sonde_data['temperature'].values + 273.15,
                                         sonde_data['dewpoint'].values + 273.15)
-        tpg.plot_profile(sonde_data['pressure'].values, wet_bulb - 273.15,
+        skt.plot_profile(sonde_data['pressure'].values, wet_bulb - 273.15,
                          label='Wet Bulb', color='violet', linewidth=0.8)
 
-    tpg.plot_barbs(pressures_winds['pressure'].values, pressures_winds['speed'].values,
+    skt.plot_barbs(pressures_winds['pressure'].values, pressures_winds['speed'].values,
                    pressures_winds['direction'].values + 180.0)
-    tpg.plot_main_title(sonde_metadata)
-    tpg.read_metadata(sonde_metadata)
-    tpg.save_tephi(output_dir=output_dir)
+    skt.plot_main_title(sonde_metadata)
+    skt.read_metadata(sonde_metadata)
+    skt.save_tephi(output_dir=output_dir)
+    # skt.save_tephi_manual(output_path=output_dir)
     plt.close('all')
 
 
 if __name__ == '__main__':
-    # https://artefacts.ceda.ac.uk/badc_datadocs/radiosonde/network.html
+
     # Change the following lines
-    main_date = datetime(2021, 7, 20, 12)
-    station_list = ['03743', '03882', '03808']
-    # station_list = ['03005', '03023', '03238', '03354', '03502', '03590',
-    #                 '03693', '03743', '03808', '03882', '03918', '03953']
-    output_dir = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis/'
+    main_date = datetime(2021, 11, 10, 0)
+    station_list = ['03882']
+    output_dir = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/skewt'
     ############################
 
     for station_num in station_list:
         try:
-            plot_wyoming_tephigram(date=main_date,
-                                   station=station_num,
-                                   output_dir=output_dir,
-                                   theta_w=True)
+            plot_wyoming_skewt(date=main_date,
+                               station=station_num,
+                               output_dir=output_dir,
+                               theta_w=False)
             print(f"Plotted {main_date.strftime('%Y-%m-%d %HZ')} for station {station_num}.")
         except ValueError as ve:
             print(ve)

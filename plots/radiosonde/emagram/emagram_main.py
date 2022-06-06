@@ -1,14 +1,12 @@
-import numbers
-import numpy as np
 from functools import partial
 import os.path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import interp1d
-from plots.radiosonde.tephigram.tephigram_transforms import *
-import plots.radiosonde.tephigram.isopleths as isopleths
-import plots.radiosonde.tephigram.labels as labels
+from plots.radiosonde.emagram.emagram_transforms import *
+import plots.radiosonde.emagram.isopleths as isopleths
+import plots.radiosonde.emagram.labels as labels
 
 
 class _PlotGroup():
@@ -48,7 +46,7 @@ class _PlotLabel():
             plot_func(level)
 
 
-class Tephigram:
+class Emagram:
     """Generates a tephigram of one or more pressure and tempereature datasets."""
 
     def __init__(self):
@@ -62,9 +60,10 @@ class Tephigram:
         # plt.show()
 
         self.figure = plt.figure(figsize=(7.8565, 11.1055))
+        # self.figure = plt.figure()
 
         # Tephigram transformation
-        self.tephi_transform = TephigramTransform()
+        self.emagram_transform = EmagramTransform()
 
         # Intialise subplot
         self.axes = self.figure.add_subplot()
@@ -85,9 +84,9 @@ class Tephigram:
         # self.figure.patch.set_visible(False)
 
         # Drawing
-        self.transform = self.tephi_transform + self.axes.transData
-        self.axes.tephi_transform = self.tephi_transform
-        self.axes.tephi_inverse = self.tephi_transform.inverted()
+        self.transform = self.emagram_transform + self.axes.transData
+        self.axes.emagram_transform = self.emagram_transform
+        self.axes.emagram_inverse = self.emagram_transform.inverted()
 
         # Draw isotherms
         isotherms_func = partial(isopleths.isotherm, 50, 1050, self.axes, self.transform,
@@ -111,62 +110,54 @@ class Tephigram:
         _PlotGroup(self.axes, isobars_func, np.arange(100, 1051, 100))
 
         # Draw moist adiabats
-        moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
+        moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, 50, self.axes, self.transform,
                                       {"color": "#23CE1F", "linewidth": 0.30})
         _PlotGroup(self.axes, moist_adiabats_func, np.arange(-40, 70, 10))
-        moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, self.axes, self.transform,
-                                      {"color": "#23CE1F", "linewidth": 0.08})
+        moist_adiabats_func = partial(isopleths.moist_adiabat, -50, 1050, 1000, 50, self.axes, self.transform,
+                                      {"color": "#23CE1F", "linewidth": 0.12})
         _PlotGroup(self.axes, moist_adiabats_func, np.arange(-40, 70, 2))
 
         # Draw mixing ratios
-        mixing_ratios_func = partial(isopleths.mixing_ratio, -50, 50, 1050, self.axes, self.transform,
+        mixing_ratios_func = partial(isopleths.mixing_ratio, -70, 50, 1050, self.axes, self.transform,
                                      {"color": "#23CE1F", "linewidth": 0.25, "linestyle": "--"})
         _PlotGroup(self.axes, mixing_ratios_func,
                    np.array([0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.80, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9,
                              10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 68, 80]))
 
         # Isotherm Labels
-        isotherm_label_list = np.arange(-40, 70, 10)
-        isotherm_label_func = partial(labels.isotherm_label, 1000, self.axes, self.transform)
+        isotherm_label_list = np.arange(-80, 60, 10)
+        isotherm_label_func = partial(labels.isotherm_label, 990, self.axes, self.transform)
         _PlotLabel(self.axes, isotherm_label_func, isotherm_label_list)
 
-        isotherm_label_list = np.arange(-80, 0, 10)
-        isotherm_label_func = partial(labels.isotherm_label, 190, self.axes, self.transform)
-        _PlotLabel(self.axes, isotherm_label_func, isotherm_label_list)
+        # isotherm_label_list = np.arange(-80, 0, 10)
+        # isotherm_label_func = partial(labels.isotherm_label, 190, self.axes, self.transform)
+        # _PlotLabel(self.axes, isotherm_label_func, isotherm_label_list)
 
         # Isentrope Labels
-        isentrope_label_list = np.arange(-40, 220, 20)
-        isentrope_label_func = partial(labels.isentrope_label, -45, self.axes, self.transform)
-        _PlotLabel(self.axes, isentrope_label_func, isentrope_label_list)
+        # isentrope_label_list = np.arange(-40, 220, 20)
+        # isentrope_label_func = partial(labels.isentrope_label, -45, self.axes, self.transform)
+        # _PlotLabel(self.axes, isentrope_label_func, isentrope_label_list)
 
         # Isobar Labels
-        isobar_label_list = np.array([50, 60, 70, 80, 90, 100, 150, 200])
-        isobar_label_func = partial(labels.isobar_label, 'isotherm', -90, self.axes, self.transform)
-        _PlotLabel(self.axes, isobar_label_func, isobar_label_list)
-
-        isobar_label_list = np.array([300])
-        isobar_label_func = partial(labels.isobar_label, 'isentrope', 0, self.axes, self.transform)
-        _PlotLabel(self.axes, isobar_label_func, isobar_label_list)
-
-        isobar_label_list = np.arange(400, 1050, 100)
-        isobar_label_func = partial(labels.isobar_label, 'isentrope', -10, self.axes, self.transform)
+        isobar_label_list = np.arange(100, 1050, 100)
+        isobar_label_func = partial(labels.isobar_label, 'isotherm', -61, self.axes, self.transform)
         _PlotLabel(self.axes, isobar_label_func, isobar_label_list)
 
         # Mixing Ratio Labels
         mixing_ratio_label_list = np.array(
             [0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.80, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9,
              10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 68, 80])
-        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 1054, 'right', self.axes, self.transform)
+        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 1070, 'left', self.axes, self.transform)
         _PlotLabel(self.axes, mixing_ratio_label_func, mixing_ratio_label_list)
-        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 496, 'left', self.axes, self.transform)
+        mixing_ratio_label_func = partial(labels.mixing_ratio_label, 49.5, 'right', self.axes, self.transform)
         _PlotLabel(self.axes, mixing_ratio_label_func, mixing_ratio_label_list)
 
         # Retain aspect ratio
-        self.axes.set_aspect(1.0)
+        self.axes.set_aspect(26.48)
 
         # Limits
-        self.axes.set_xlim(0.48, 1.26)
-        self.axes.set_ylim(-1.06, -0.18)
+        self.axes.set_xlim(-90, 50)
+        self.axes.set_ylim(-0.2, 3.3)
 
         # Initialise blank profile lists
         self._profiles = []
@@ -255,8 +246,8 @@ class Title:
                               f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
 
     def plot_main_title(self, **kwargs):
-        self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',
-                           textcoords='offset points', fontsize=20)
+        self.axes.annotate(self.plot_title, xy=(0.98, 0.92), xytext=(0, 0), xycoords='axes fraction',
+                           textcoords='offset points', fontsize=14, ha='right')
 
 
 class DorsetTitle(object):
@@ -282,10 +273,10 @@ class Profile:
         pressures, temperatures = np.asarray(pressures), np.asarray(temperatures)
         assert pressures.shape == temperatures.shape
         self.axes = axes
-        self._transform = self.axes.tephi_transform + self.axes.transData
+        self._transform = self.axes.emagram_transform + self.axes.transData
         self.pressures = pressures
         self.temperatures = temperatures
-        _, self.thetas = convert_pressure_temperature_to_pressure_theta(self.pressures, self.temperatures)
+        # _, self.thetas = convert_pressure_temperature_to_pressure_theta(self.pressures, self.temperatures)
         # self.line = None
 
     def plot(self, **kwargs):
@@ -293,7 +284,7 @@ class Profile:
             kwargs["zorder"] = 10
 
         (self.line,) = self.axes.plot(
-            self.temperatures, self.thetas, transform=self._transform, **kwargs
+            self.temperatures, self.pressures, transform=self._transform, **kwargs
         )
         return self.line
 
@@ -308,7 +299,7 @@ class Barbs:
         self.wind_directions = wind_directions
         self.barbs = None
         self._gutter = None
-        self._transform = self.axes.tephi_transform + self.axes.transData
+        self._transform = self.axes.emagram_transform + self.axes.transData
         self._kwargs = None
         self._custom_kwargs = None
         self._custom = dict(
@@ -322,27 +313,27 @@ class Barbs:
         v = magnitude * np.cos(np.deg2rad(angle))
         return u, v
 
-    def _make_barb(self, temperature, theta, speed, angle):
+    def _make_barb(self, temperature, pressure, speed, angle):
         u, v = self._uv(speed, angle)
-        barb = plt.barbs(temperature, theta, u, v, transform=self._transform, **self._kwargs)
+        barb = plt.barbs(temperature, pressure, u, v, transform=self._transform, **self._kwargs)
         return barb
 
     def _calculate_barb_positions(self, pressures):
         axesfrac_y_points = np.linspace(0, 1, 1001)
         axesfrac_x_points = np.ones_like(axesfrac_y_points) * self._gutter
         axes_frac_xy = np.column_stack((axesfrac_x_points, axesfrac_y_points))
-        transAxes = self.axes.transLimits.inverted() + self.axes.tephi_inverse
-        temperature_theta_points = transAxes.transform(axes_frac_xy)
-        temperature, theta = temperature_theta_points[:, 0], temperature_theta_points[:, 1]
-        _, pressure_points = convert_temperature_theta_to_temperature_pressure(temperature, theta)
-        interp_func = interp1d(pressure_points, temperature, fill_value="extrapolate")
+        transAxes = self.axes.transLimits.inverted() + self.axes.emagram_inverse
+        temperature_pressure_points = transAxes.transform(axes_frac_xy)
+        temperature, pressure = temperature_pressure_points[:, 0], temperature_pressure_points[:, 1]
+        # _, pressure_points = convert_temperature_theta_to_temperature_pressure(temperature, pressure)
+        interp_func = interp1d(pressure, temperature, fill_value="extrapolate")
         temperatures = interp_func(pressures)
-        _, thetas = convert_pressure_temperature_to_pressure_theta(pressures, temperatures)
+        # _, thetas = convert_pressure_temperature_to_pressure_theta(pressures, temperatures)
 
-        return temperatures, thetas
+        return temperatures, pressures
 
     def plot(self, **kwargs):
-        self._gutter = kwargs.pop("gutter", 0.9)
+        self._gutter = kwargs.pop("gutter", 0.95)
         self._kwargs = dict(length=5, linewidth=0.2, zorder=10)
         self._kwargs.update(kwargs)
         self._custom_kwargs = dict(
@@ -357,10 +348,6 @@ class Barbs:
         self.pressures, self.wind_speeds, self.wind_directions = \
             np.asarray(self.pressures), np.asarray(self.wind_speeds), np.asarray(self.wind_directions)
 
-        temperatures, thetas = self._calculate_barb_positions(self.pressures)
-        self._make_barb(temperatures, thetas, self.wind_speeds, self.wind_directions)
-
-
-if __name__ == '__main__':
-    tpg = Tephigram()
-    plt.savefig('test.png', dpi=300, pad_inches=0)
+        temperatures, _ = self._calculate_barb_positions(self.pressures)
+        pressures = self.pressures
+        self._make_barb(temperatures, pressures, self.wind_speeds, self.wind_directions)

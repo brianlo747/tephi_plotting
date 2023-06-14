@@ -207,7 +207,7 @@ class Tephigram:
             self.station_name = self.sonde_lookup_table.loc[self.station_id]['name']
 
     def read_metadata_dorset(self, metadata):
-        self.station_id = None
+        self.station_id = metadata.loc['LOCATION', 'info']
         self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
         self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
         self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
@@ -263,12 +263,14 @@ class DorsetTitle(object):
 
     def __init__(self, metadata, axes):
         self.axes = axes
+        self.station_id = metadata.loc['LOCATION', 'info']
         self.year = f"{metadata.loc['YEAR', 'info']:.0f}"
         self.month = f"{metadata.loc['MONTH', 'info']:02.0f}"
         self.day = f"{metadata.loc['DAY', 'info']:02.0f}"
         self.hour = f"{metadata.loc['HOUR', 'info']:02.0f}"
         self.minute = f"{metadata.loc['MINT', 'info']:02.0f}"
-        self.plot_title = f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
+        self.plot_title = f"{self.station_id}\n" \
+                          f"{self.year}-{self.month}-{self.day} {self.hour}{self.minute}Z"
 
     def plot_main_title(self, **kwargs):
         self.axes.annotate(self.plot_title, xy=(0.02, 0.92), xytext=(0, 0), xycoords='axes fraction',

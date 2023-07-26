@@ -48,7 +48,7 @@ def plot_wescon_tephigram(infile, outpath, outfile=None, theta_w=False):
 
 if __name__ == '__main__':
     # Change the following lines
-    files = glob.glob("/Users/brianlo/Desktop/Reading/PhD/WCD/input/*")
+    files = glob.glob("/Users/brianlo/Desktop/Reading/PhD/WESCON/sonde_data/20230621/*")
     for input_file in files:
         # input_file = '/Users/brianlo/Downloads/edt1sdataforv217_20230612_1402.txt'
         # output_file = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis_wescon/test1'

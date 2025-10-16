@@ -37,14 +37,12 @@ def plot_dorset_tephigram(infile, outfile, theta_w=False):
 
 if __name__ == '__main__':
     # Change the following lines
-    # input_file = '/Users/brianlo/Desktop/Reading/PhD/WCD/input_dorset' \
-    #              '/MW41-Durlston-20231022-092449-SynchronizedSoundingData.csv'
-    # output_file = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis_dorset' \
-    #               '/MW41-Durlston-20231022-092449-SynchronizedSoundingData'
     input_file = '/Users/brianlo/Downloads/MW41-Reading-20250322-122409-SynchronizedSoundingData.csv'
     output_file = '/Users/brianlo/Downloads/MW41-Reading-20250322-122409-SynchronizedSoundingData.png'
     ############################
     plot_dorset_tephigram(infile=input_file,
                           outfile=output_file,
-                          theta_w=True)
-    print(f"Plotted {input_file}.")
+                          theta_w=True, # Set to False for your students to
+                                        # draw the wet-bulb potential temperature line on their own 😈
+                          )
+    print(f"Plotted {input_file} and saved to {output_file}")

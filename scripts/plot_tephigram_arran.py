@@ -38,8 +38,8 @@ def plot_wyoming_tephigram(date, station, output_dir, theta_w=False):
 if __name__ == '__main__':
     # https://artefacts.ceda.ac.uk/badc_datadocs/radiosonde/network.html
     # Change the following lines
-    main_date = datetime(2021, 7, 20, 12)
-    station_list = ['03743', '03882', '03808']
+    main_date = datetime(2020, 8, 12, 0)
+    station_list = ['03882']
     # station_list = ['03005', '03023', '03238', '03354', '03502', '03590',
     #                 '03693', '03743', '03808', '03882', '03918', '03953']
     output_dir = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis/'

@@ -41,11 +41,18 @@ class DorsetRadiosonde(object):
         return meta_df
 
     def prune_data(self, prune_pressure_list):
-        pruned_profile = pd.DataFrame()
+        # Collect rows as DataFrames instead of Series to preserve dtypes
+        rows = []
         for prune_pressure in prune_pressure_list:
-            idx = self.df['Pressure'].sub(prune_pressure).abs().argmin()
-            pruned_profile = pruned_profile.append(self.df.iloc[idx], ignore_index=True)
-        pruned_profile.drop_duplicates(subset=['Pressure'])
+            idx = (self.df['Pressure'] - prune_pressure).abs().idxmin()
+            rows.append(self.df.iloc[[idx]])  # Note the double brackets → keeps it as DataFrame
+
+        # Concatenate vertically, preserving dtypes
+        pruned_profile = pd.concat(rows, ignore_index=True)
+
+        # Drop duplicates properly
+        pruned_profile = pruned_profile.drop_duplicates(subset=['Pressure'])
+
         return pruned_profile
 
 

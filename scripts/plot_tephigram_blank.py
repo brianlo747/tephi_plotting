@@ -15,21 +15,21 @@ def plot_dorset_tephigram(infile, outfile, theta_w=False):
 
     tpg = Tephigram()
 
-    tpg.plot_profile(sonde_data['Pressure'].values, sonde_data['Temperature'].values - 273.15,
-                     label='Temperature', color='red', linewidth=0.8)
-    tpg.plot_profile(sonde_data['Pressure'].values, sonde_data['Dewpoint'].values,
-                     label='Dew Point', color='blue', linewidth=0.8)
-    if theta_w:
-        wet_bulb = wet_bulb_temperature(sonde_data['Pressure'].values * 100,
-                                        sonde_data['Temperature'].values,
-                                        sonde_data['Dewpoint'].values + 273.15)
-        tpg.plot_profile(sonde_data['Pressure'].values, wet_bulb - 273.15,
-                         label='Wet Bulb', color='violet', linewidth=0.8)
-
-    tpg.plot_barbs(pressures_winds['Pressure'].values, pressures_winds['WindSpeed'].values * 1.94384,
-                   pressures_winds['WindDir'].values + 180)
-    tpg.plot_dorset_title(sonde_metadata)
-    tpg.read_metadata_dorset(sonde_metadata)
+    # tpg.plot_profile(sonde_data['Pressure'].values, sonde_data['Temperature'].values - 273.15,
+    #                  label='Temperature', color='red', linewidth=0.8)
+    # tpg.plot_profile(sonde_data['Pressure'].values, sonde_data['Dewpoint'].values,
+    #                  label='Dew Point', color='blue', linewidth=0.8)
+    # if theta_w:
+    #     wet_bulb = wet_bulb_temperature(sonde_data['Pressure'].values * 100,
+    #                                     sonde_data['Temperature'].values,
+    #                                     sonde_data['Dewpoint'].values + 273.15)
+    #     tpg.plot_profile(sonde_data['Pressure'].values, wet_bulb - 273.15,
+    #                      label='Wet Bulb', color='violet', linewidth=0.8)
+    #
+    # tpg.plot_barbs(pressures_winds['Pressure'].values, pressures_winds['WindSpeed'].values * 1.94384,
+    #                pressures_winds['WindDir'].values + 180)
+    # tpg.plot_dorset_title(sonde_metadata)
+    # tpg.read_metadata_dorset(sonde_metadata)
     tpg.save_tephi_manual(output_path=f"{outfile}.png", dpi=300)
     tpg.save_tephi_manual(output_path=f"{outfile}.pdf")
     plt.close('all')
@@ -41,8 +41,8 @@ if __name__ == '__main__':
     #              '/MW41-Durlston-20231022-092449-SynchronizedSoundingData.csv'
     # output_file = '/Users/brianlo/Desktop/Reading/PhD/WCD/output/tephis_dorset' \
     #               '/MW41-Durlston-20231022-092449-SynchronizedSoundingData'
-    input_file = '/Users/brianlo/Downloads/MW41-Reading-20250322-122409-SynchronizedSoundingData.csv'
-    output_file = '/Users/brianlo/Downloads/MW41-Reading-20250322-122409-SynchronizedSoundingData.png'
+    input_file = '/Users/brianlo/Desktop/tephis/data/MW41-Durlston-20241026-102315-SynchronizedSoundingData.csv'
+    output_file = '/Users/brianlo/Desktop/tephis/output/MW41-Durlston-20241026-102315-SynchronizedSoundingData'
     ############################
     plot_dorset_tephigram(infile=input_file,
                           outfile=output_file,
